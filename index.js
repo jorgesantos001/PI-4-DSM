@@ -4,7 +4,10 @@ const bodyParser = require('body-parser');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 const SensorData = require('./models/SensorData');
+const User = require('./models/User');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const PORT = 4000; 
@@ -59,6 +62,49 @@ app.delete('/data/:id', async (req, res) => {
       return res.status(404).send({ error: 'Data not found' });
     }
     res.status(200).send({ message: 'Data deleted successfully' });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+// Route to register user
+app.post('/register', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ email, password: hashedPassword });
+    await newUser.save();
+    res.status(201).send({ userId: newUser._id });
+  } catch (error) {
+    res.status(400).send({ error: error.message });
+  }
+});
+
+// Route to check if user exists
+app.get('/exists', async (req, res) => {
+  try {
+    const { email } = req.query;
+    const userExists = await User.exists({ email });
+    res.status(200).send({ exists: !!userExists });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+// Route to login user
+app.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).send({ error: 'Unauthorized' });
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).send({ error: 'Unauthorized' });
+    }
+    const token = jwt.sign({ userId: user._id }, 'secret_key', { expiresIn: '1h' });
+    res.status(200).send({ token });
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
