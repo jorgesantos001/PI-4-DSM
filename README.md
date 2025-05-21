@@ -46,8 +46,12 @@ npm start
 
 ### 4. Acesse a API
 
-- API disponível em: [http://localhost:4000](http://localhost:4000)  
-- Documentação Swagger: [http://localhost:4000/api-docs](http://localhost:4000/api-docs)
+- API disponível em:
+  - Local: http://localhost:4000
+  - VM Azure: http://172.174.21.128:4000
+- Documentação Swagger:
+  - Local: http://localhost:4000/api-docs
+  - VM Azure: http://172.174.21.128:4000/api-docs 
 
 ---
 
