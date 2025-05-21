@@ -20,7 +20,7 @@ app.use(cors());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/pi-4-dsm', {
+mongoose.connect('mongodb://172.174.21.128:27017/pi-4-dsm', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
