@@ -8,6 +8,7 @@ const User = require('./models/User');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+require('dotenv').config();
 
 const app = express();
 const PORT = 4000; 
@@ -20,7 +21,7 @@ app.use(cors());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // MongoDB connection
-mongoose.connect('mongodb://172.174.21.128:27017/pi-4-dsm', {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
