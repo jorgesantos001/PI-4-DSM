@@ -3,25 +3,128 @@
   "info": {
     "version": "1.0.0",
     "title": "PI-4 API",
-    "description": "API documentation for PI-4 Backend"
+    "description": "API para monitoramento de temperatura e umidade"
   },
-  "host": "localhost:3000",
+  "host": "localhost:4000",
   "basePath": "/",
   "schemes": ["http"],
   "paths": {
     "/": {
       "get": {
         "summary": "Welcome route",
-        "description": "Returns a welcome message",
+        "description": "Mensagem de boas-vindas",
+        "responses": {
+          "200": { "description": "OK" }
+        }
+      }
+    },
+    "/api/register": {
+      "post": {
+        "summary": "Registrar novo usuário",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/UserRegister" }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Usuário registrado" },
+          "400": { "description": "Erro de validação" }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "summary": "Login de usuário",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/UserLogin" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Login bem-sucedido, retorna token" },
+          "401": { "description": "Credenciais inválidas" }
+        }
+      }
+    },
+    "/api/sensor-data": {
+      "get": {
+        "summary": "Listar dados dos sensores",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "type": "string",
+            "format": "date-time",
+            "description": "Data inicial (opcional)"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "type": "string",
+            "format": "date-time",
+            "description": "Data final (opcional)"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Successful response",
+            "description": "Lista de dados",
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": { "$ref": "#/definitions/SensorData" }
             }
           }
         }
+      },
+      "post": {
+        "summary": "Enviar novo dado de sensor",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/SensorData" }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Dado salvo" },
+          "400": { "description": "Erro de validação" }
+        }
       }
+    }
+  },
+  "definitions": {
+    "UserRegister": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "password": { "type": "string" }
+      },
+      "required": ["name", "email", "password"]
+    },
+    "UserLogin": {
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "password": { "type": "string" }
+      },
+      "required": ["email", "password"]
+    },
+    "SensorData": {
+      "type": "object",
+      "properties": {
+        "sensorId": { "type": "string" },
+        "type": { "type": "string", "enum": ["temperature", "humidity"] },
+        "value": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["sensorId", "type", "value", "timestamp"]
     }
   }
 }
